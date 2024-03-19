@@ -23,10 +23,12 @@ const handleClick = (ramen) => {
 };
 
 const addSubmitListener = () => {
-  // Add code
+  // New ramen form
   const ramenForm = document.querySelector("#new-ramen");
   ramenForm.addEventListener("submit", (event) => {
     event.preventDefault();
+
+    // create new ramen
     const newRamen = {
       name: event.target.name.value,
       restaurant: event.target.restaurant.value,
@@ -34,7 +36,34 @@ const addSubmitListener = () => {
       rating: event.target.rating.value,
       comment: event.target.comment.value,
     };
+
+    // persist new ramen to the backend
+    const postNewRamen = async () => {
+      const response = await fetch("http://localhost:3000/ramens", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(newRamen),
+      });
+    };
+    postNewRamen();
     addRamen(newRamen);
+    event.target.reset();
+  });
+
+  // Edit ramen form
+  const editRamenForm = document.querySelector("#edit-ramen");
+  editRamenForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    // udpate display
+    const ramenDetailRating = document.querySelector("#rating-display");
+    ramenDetailRating.textContent = event.target.rating.value;
+    const ramenDetailComment = document.querySelector("#comment-display");
+    ramenDetailComment.textContent = event.target.comment.value;
+
     event.target.reset();
   });
 };
@@ -49,22 +78,30 @@ const displayRamens = () => {
     for (const ramen of ramens) {
       addRamen(ramen);
     }
+
+    // display info for first ramen immediately without having to click
+    handleClick(ramens[0]);
   };
   fetchRamen();
 };
 
+// add ramens to ramen menu
 const addRamen = (ramen) => {
   const ramenMenu = document.querySelector("#ramen-menu");
+  const deleteButton = document.querySelector("button");
+
+  // construct ramen image element
   const ramenImg = document.createElement("img");
   ramenImg.src = ramen.image;
   ramenImg.alt = `${ramen.name} photo`;
   ramenImg.className = "ramen-menu";
 
+  // display info in the center if ramen is clicked
   ramenImg.addEventListener("click", () => {
     handleClick(ramen);
   });
 
-  // only add ramen image to ramen menu
+  // add ramen image to ramen menu
   ramenMenu.append(ramenImg);
 };
 
